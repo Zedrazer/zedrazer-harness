@@ -1,0 +1,28 @@
+pipeline:
+  name: zedrazer-infra
+  identifier: zedrazerinfra
+  projectIdentifier: default_project
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: zedrazergh
+        repoName: zedrazer-log-forward-infrastructure
+        build: <+input>
+  stages:
+    - stage:
+        name: terraform-ci
+        identifier: terraformci
+        template:
+          templateRef: terraformci
+          versionLabel: v1-dev
+          templateInputs:
+            type: CI
+            variables:
+              - name: runner_image_version
+                type: String
+                value: <+input>.default(1.14.6)
+              - name: working_dir
+                type: String
+                value: <+input>.default(.)
