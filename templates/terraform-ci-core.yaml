@@ -1,20 +1,21 @@
 template:
   name: terraform-ci-core
   identifier: terraformcicore
-  versionLabel: v1.0.0
+  versionLabel: v1.0.1
+  isStable: true
   type: Stage
   projectIdentifier: default_project
   orgIdentifier: default
   tags: {}
   spec:
     type: CI
-    variables:
+    inputs:
       - name: terraformVersion
         type: String
-        value: <+input>.default("1.14")
+        default: "1.14"
       - name: workingDirectory
         type: String
-        value: <+input>.default(".")
+        default: "."
     spec:
       cloneCodebase: true
       caching:
@@ -38,11 +39,11 @@ template:
               identifier: terraformfmt
               spec:
                 connectorRef: Dockerhub
-                image: <+"hashicorp/terraform:" + <+stage.variables.terraformVersion>>
+                image: <+"hashicorp/terraform:" + <+inputs.terraformVersion>>
                 shell: Sh
                 command: |-
                   set -euo pipefail
-                  cd "<+stage.variables.workingDirectory>"
+                  cd "<+inputs.workingDirectory>"
                   terraform fmt -check -recursive -diff
               description: Format the terraform using native terraform command
     sendGitStatus:
