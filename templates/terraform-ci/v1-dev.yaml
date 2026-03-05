@@ -36,7 +36,6 @@ template:
                 command: |-
                   cd <+stage.variables.working_dir>
                   terraform fmt -check
-                  terraform init
                 imagePullPolicy: IfNotPresent
               description: Runs native terraform fmt against codebase
     variables:
