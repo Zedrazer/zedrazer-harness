@@ -1,0 +1,27 @@
+inputSet:
+  name: zedrazer-infra
+  identifier: zedrazerinfra
+  orgIdentifier: default
+  projectIdentifier: default_project
+  pipeline:
+    identifier: zedrazerinfra
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>
+    stages:
+      - stage:
+          identifier: terraformci
+          template:
+            templateInputs:
+              type: CI
+              variables:
+                - name: runner_image_version
+                  type: String
+                  value: 1.14.6
+                - name: working_dir
+                  type: String
+                  value: .
