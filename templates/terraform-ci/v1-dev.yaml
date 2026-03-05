@@ -1,0 +1,51 @@
+template:
+  name: terraform-ci
+  identifier: terraformci
+  versionLabel: v1-dev
+  type: Stage
+  projectIdentifier: default_project
+  orgIdentifier: default
+  tags: {}
+  spec:
+    type: CI
+    spec:
+      cloneCodebase: true
+      caching:
+        enabled: true
+        override: true
+      buildIntelligence:
+        enabled: true
+      infrastructure:
+        type: KubernetesDirect
+        spec:
+          connectorRef: zedrazer
+          namespace: harness-delegates
+          automountServiceAccountToken: true
+          nodeSelector: {}
+          os: Linux
+      execution:
+        steps:
+          - step:
+              type: Run
+              name: terraform-fmt
+              identifier: terraformfmt
+              spec:
+                connectorRef: Dockerhub
+                image: hashicorp/terraform:<+stage.variables.runner_image_version>
+                shell: Sh
+                command: |-
+                  cd <+stage.variables.working_dir>
+                  terraform fmt -check
+                imagePullPolicy: IfNotPresent
+              description: Runs native terraform fmt against codebase
+    variables:
+      - name: runner_image_version
+        type: String
+        description: ""
+        required: false
+        value: <+input>.default(1.14.6)
+      - name: working_dir
+        type: String
+        description: ""
+        required: false
+        value: <+input>.default(.)
