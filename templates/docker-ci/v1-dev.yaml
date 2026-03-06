@@ -11,10 +11,11 @@ template:
     spec:
       cloneCodebase: true
       caching:
-        enabled: true
+        enabled: false
         override: true
+        paths: []
       buildIntelligence:
-        enabled: true
+        enabled: false
       infrastructure:
         type: KubernetesDirect
         spec:
@@ -25,6 +26,15 @@ template:
           os: Linux
       execution:
         steps:
+          - step:
+              type: Background
+              name: dind
+              identifier: dind
+              spec:
+                connectorRef: Dockerhub
+                image: docker:dind
+                shell: Sh
+                privileged: true
           - step:
               type: Run
               name: docker-build
@@ -43,6 +53,8 @@ template:
                 image: zedrazer/harness-docker-builder:1.0.0
                 shell: Sh
                 command: trivy image --exit-code 1 --severity HIGH,CRITICAL zedrazer/<+stage.variables.docker_image_name>:<+stage.variables.docker_image_tag>
+      sharedPaths:
+        - /var/run
     variables:
       - name: docker_image_name
         type: String
