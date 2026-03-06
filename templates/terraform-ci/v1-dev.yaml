@@ -68,7 +68,7 @@ template:
                   terraform plan
                 envVariables:
                   AWS_ACCESS_KEY: <+secrets.getValue("aws_access_key_id")>
-                  AWS_SECRET_ACCESS_KEY: <+secrets.getValue("aws_secret_access_key_id")>
+                  AWS_SECRET_ACCESS_KEY: <+secrets.getValue("aws_secret_access_key")>
                   AWS_DEFAULT_REGION: eu-west-2
     variables:
       - name: runner_image_version
