@@ -1,0 +1,36 @@
+template:
+  name: docker-build-publish
+  identifier: dockerbuildpublish
+  versionLabel: v1-dev
+  type: Stage
+  projectIdentifier: default_project
+  orgIdentifier: default
+  tags: {}
+  spec:
+    type: CI
+    spec:
+      cloneCodebase: true
+      caching:
+        enabled: true
+        override: true
+      buildIntelligence:
+        enabled: true
+      infrastructure:
+        type: KubernetesDirect
+        spec:
+          connectorRef: zedrazer
+          namespace: harness-delegates
+          automountServiceAccountToken: true
+          nodeSelector: {}
+          os: Linux
+      execution:
+        steps:
+          - step:
+              type: BuildAndPushDockerRegistry
+              name: BuildAndPushDockerRegistry
+              identifier: BuildAndPushDockerRegistry
+              spec:
+                connectorRef: Dockerhub
+                repo: <+input>
+                tags:
+                  - <+stage.variables.image_tag>
