@@ -1,0 +1,27 @@
+inputSet:
+  name: terraform-plan-summariser-action-pr-is
+  identifier: terraformplansummariseractionpris
+  orgIdentifier: default
+  projectIdentifier: default_project
+  pipeline:
+    identifier: zedrazertfplansummariserdocker
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>
+    stages:
+      - stage:
+          identifier: dockerci
+          template:
+            templateInputs:
+              type: CI
+              variables:
+                - name: docker_image_name
+                  type: String
+                  value: terraform-plan-summariser-action
+                - name: docker_image_tag
+                  type: String
+                  value: <+trigger.prNumber>
