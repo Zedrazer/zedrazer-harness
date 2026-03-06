@@ -31,6 +31,6 @@ template:
               identifier: BuildAndPushDockerRegistry
               spec:
                 connectorRef: Dockerhub
-                repo: <+input>
+                repo: zedrazer/<+input>
                 tags:
                   - <+stage.variables.image_tag>
