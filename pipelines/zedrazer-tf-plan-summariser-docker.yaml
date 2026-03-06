@@ -1,0 +1,28 @@
+pipeline:
+  name: zedrazer-tf-plan-summariser-docker
+  identifier: zedrazertfplansummariserdocker
+  projectIdentifier: default_project
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: zedrazergh
+        repoName: terraform-plan-summariser-action
+        build: <+input>
+  stages:
+    - stage:
+        name: docker-ci
+        identifier: dockerci
+        template:
+          templateRef: dockerci
+          versionLabel: v1-dev
+          templateInputs:
+            type: CI
+            variables:
+              - name: docker_image_name
+                type: String
+                value: <+input>
+              - name: docker_image_tag
+                type: String
+                value: <+input>
