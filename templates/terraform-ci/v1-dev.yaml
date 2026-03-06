@@ -25,19 +25,51 @@ template:
           os: Linux
       execution:
         steps:
+          - parallel:
+              - step:
+                  type: Run
+                  name: terraform-fmt
+                  identifier: terraformfmt
+                  spec:
+                    connectorRef: Dockerhub
+                    image: hashicorp/terraform:<+stage.variables.runner_image_version>
+                    shell: Sh
+                    command: |-
+                      cd <+stage.variables.working_dir>
+                      terraform fmt -check
+                    imagePullPolicy: IfNotPresent
+                  description: Runs native terraform fmt against codebase
+              - step:
+                  type: Run
+                  name: terraform-validate
+                  identifier: terraformvalidate
+                  spec:
+                    connectorRef: Dockerhub
+                    image: hashicorp/terraform:<+stage.variables.runner_image_version>
+                    shell: Sh
+                    command: |-
+                      cd <+stage.variables.working_dir>
+                      terraform init
+                      terraform validate
+                    envVariables:
+                      AWS_ACCESS_KEY_ID: <+secrets.getValue("aws_access_key_id")>
+                      AWS_SECRET_ACCESS_KEY: <+secrets.getValue("aws_secret_access_key")>
+                      AWS_DEFAULT_REGION: eu-west-2
           - step:
               type: Run
-              name: terraform-fmt
-              identifier: terraformfmt
+              name: terraform-plan
+              identifier: terraformplan
               spec:
                 connectorRef: Dockerhub
                 image: hashicorp/terraform:<+stage.variables.runner_image_version>
                 shell: Sh
                 command: |-
                   cd <+stage.variables.working_dir>
-                  terraform fmt -check
-                imagePullPolicy: IfNotPresent
-              description: Runs native terraform fmt against codebase
+                  terraform plan
+                envVariables:
+                  AWS_ACCESS_KEY: <+secrets.getValue("aws_access_key_id")>
+                  AWS_SECRET_ACCESS_KEY: <+secrets.getValue("aws_secret_access_key_id")>
+                  AWS_DEFAULT_REGION: eu-west-2
     variables:
       - name: runner_image_version
         type: String
