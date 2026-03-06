@@ -1,0 +1,56 @@
+template:
+  name: docker-ci
+  identifier: dockerci
+  versionLabel: v1-dev
+  type: Stage
+  projectIdentifier: default_project
+  orgIdentifier: default
+  tags: {}
+  spec:
+    type: CI
+    spec:
+      cloneCodebase: true
+      caching:
+        enabled: true
+        override: true
+      buildIntelligence:
+        enabled: true
+      infrastructure:
+        type: KubernetesDirect
+        spec:
+          connectorRef: zedrazer
+          namespace: harness-delegates
+          automountServiceAccountToken: true
+          nodeSelector: {}
+          os: Linux
+      execution:
+        steps:
+          - step:
+              type: Run
+              name: docker-build
+              identifier: dockerbuild
+              spec:
+                connectorRef: Dockerhub
+                image: zedrazer/harness-docker-builder:1.0.0
+                shell: Sh
+                command: docker build -t zedrazer/<+stage.variables.docker_image_name>:<+stage.variables.docker_image_tag> .
+          - step:
+              type: Run
+              name: docker-scan
+              identifier: dockerscan
+              spec:
+                connectorRef: Dockerhub
+                image: zedrazer/harness-docker-builder:1.0.0
+                shell: Sh
+                command: trivy image --exit-code 1 --severity HIGH,CRITICAL zedrazer/<+stage.variables.docker_image_name>:<+stage.variables.docker_image_tag>
+    variables:
+      - name: docker_image_name
+        type: String
+        description: ""
+        required: true
+        value: <+input>
+      - name: docker_image_tag
+        type: String
+        description: ""
+        required: true
+        value: <+input>
